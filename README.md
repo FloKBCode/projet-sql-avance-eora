@@ -53,3 +53,19 @@ Deux clés étrangères souvent cherchées (PostgreSQL ne les indexe pas tout se
 |---|---|---|---|
 | `lignes_commande (commande_id)` | détail de la commande 12345 (4 lignes sur 60 000) | Seq Scan, 3,343 ms | Bitmap Index Scan, 0,038 ms |
 | `commandes (client_id)` | historique du client 250 (36 commandes sur 20 000) | Seq Scan, 1,640 ms | Index Scan, 0,046 ms |
+
+## Rôles
+
+**Ce qu'il fait** : deux rôles-métiers, `atelier` (prépare les commandes) et `compta` (suit les ventes), sans connexion. Deux utilisateurs, `nora` et `samir`, se connectent et en héritent avec `IN ROLE`.
+
+**Pourquoi il est là** : principe du moindre privilège. Chaque profil n'a que ce dont il a besoin, et les droits sont portés par le métier, pas par la personne : si Nora quitte l'atelier, on supprime `nora` sans toucher aux droits de l'atelier.
+
+**La preuve** : `SET ROLE nora;` puis `SELECT * FROM commandes_a_preparer;` répond, alors que `SELECT email FROM clients;` affiche `permission denied`. Même chose pour `samir` avec `chiffre_affaires` (autorisé) et `commandes` (refusé). `RESET ROLE;` pour revenir.
+
+## Vues
+
+**Ce qu'elles font** : `commandes_a_preparer` liste, pour l'atelier, les commandes payées ou en préparation avec les produits et les quantités ; le client est réduit à son prénom et à l'initiale de son nom. `chiffre_affaires` donne à la compta le chiffre d'affaires et le nombre de commandes par mois et par canal, sans aucune colonne venant de `clients`.
+
+**Pourquoi elles sont là** : elles cachent les jointures (quatre tables pour l'atelier) et masquent les données personnelles (email, téléphone, nom complet). Chaque rôle a le droit `SELECT` sur sa vue et aucun droit sur les tables : la vue lit les tables à sa place.
+
+**La preuve** : en tant que `nora`, la vue affiche `Léa B.` mais pas d'email, et la table `clients` renvoie `permission denied` ; en tant que `samir`, `chiffre_affaires` répond mais `commandes_a_preparer` est refusée.
