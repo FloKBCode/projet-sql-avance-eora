@@ -139,3 +139,33 @@ BEGIN
     UPDATE commandes SET statut = 'annulee' WHERE id = p_commande_id;
 END;
 $$;
+
+-- Trigger : refuser une ligne de commande qui dépasse le stock
+-- La fonction fait la vérification, le trigger la lance avant chaque insertion.
+CREATE FUNCTION verifier_stock()
+RETURNS trigger
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    v_nom text;
+    v_stock integer;
+BEGIN
+    SELECT nom, stock INTO v_nom, v_stock FROM produits WHERE id = NEW.produit_id;
+
+    IF NOT FOUND THEN
+        RAISE EXCEPTION 'Produit % inconnu : impossible de l''ajouter à la commande', NEW.produit_id;
+    END IF;
+
+    IF NEW.quantite > v_stock THEN
+        RAISE EXCEPTION 'Stock insuffisant pour « % » : % demandé(s), % disponible(s)',
+            v_nom, NEW.quantite, v_stock;
+    END IF;
+
+    RETURN NEW;
+END;
+$$;
+
+CREATE TRIGGER verifier_stock_avant_ajout
+BEFORE INSERT ON lignes_commande
+FOR EACH ROW
+EXECUTE FUNCTION verifier_stock();
