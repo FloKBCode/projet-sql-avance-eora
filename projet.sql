@@ -113,3 +113,78 @@ FROM (
   FROM generate_series(1, 60000) AS i
 ) AS s
 JOIN produits p ON p.id = s.produit_id;
+
+-- Procédure : annuler une commande
+-- Refuse une commande inconnue, déjà expédiée ou déjà annulée.
+CREATE PROCEDURE annuler_commande(p_commande_id int)
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    v_statut text;
+BEGIN
+    SELECT statut INTO v_statut FROM commandes WHERE id = p_commande_id;
+
+    IF NOT FOUND THEN
+        RAISE EXCEPTION 'Commande % inconnue : impossible de l''annuler', p_commande_id;
+    END IF;
+
+    IF v_statut = 'expediee' THEN
+        RAISE EXCEPTION 'Commande % déjà expédiée : impossible de l''annuler', p_commande_id;
+    END IF;
+
+    IF v_statut = 'annulee' THEN
+        RAISE EXCEPTION 'Commande % déjà annulée : rien à faire', p_commande_id;
+    END IF;
+
+    UPDATE commandes SET statut = 'annulee' WHERE id = p_commande_id;
+
+    -- Les produits de la commande reviennent en stock
+    UPDATE produits p
+    SET stock = p.stock + l.total
+    FROM (SELECT produit_id, sum(quantite) AS total
+          FROM lignes_commande
+          WHERE commande_id = p_commande_id
+          GROUP BY produit_id) AS l
+    WHERE p.id = l.produit_id;
+END;
+$$;
+
+-- Trigger : refuser une ligne de commande qui dépasse le stock, sinon baisser le stock
+-- La fonction fait la vérification, le trigger la lance avant chaque insertion.
+CREATE FUNCTION verifier_stock()
+RETURNS trigger
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    v_nom text;
+    v_stock integer;
+BEGIN
+    -- FOR UPDATE bloque le produit le temps de la vérification (deux commandes simultanées)
+    SELECT nom, stock INTO v_nom, v_stock FROM produits WHERE id = NEW.produit_id FOR UPDATE;
+
+    IF NOT FOUND THEN
+        RAISE EXCEPTION 'Produit % inconnu : impossible de l''ajouter à la commande', NEW.produit_id;
+    END IF;
+
+    IF NEW.quantite > v_stock THEN
+        RAISE EXCEPTION 'Stock insuffisant pour « % » : % demandé(s), % disponible(s)',
+            v_nom, NEW.quantite, v_stock;
+    END IF;
+
+    UPDATE produits SET stock = stock - NEW.quantite WHERE id = NEW.produit_id;
+
+    RETURN NEW;
+END;
+$$;
+
+CREATE TRIGGER verifier_stock_avant_ajout
+BEFORE INSERT ON lignes_commande
+FOR EACH ROW
+EXECUTE FUNCTION verifier_stock();
+
+-- Index : clés étrangères souvent cherchées, que PostgreSQL n'indexe pas tout seul
+-- Détail d'une commande : WHERE commande_id = 12345 (Seq Scan 3,3 ms -> Index 0,04 ms)
+CREATE INDEX idx_lignes_commande_commande_id ON lignes_commande (commande_id);
+
+-- Historique d'un client : WHERE client_id = 250 (Seq Scan 1,6 ms -> Index 0,05 ms)
+CREATE INDEX idx_commandes_client_id ON commandes (client_id);
