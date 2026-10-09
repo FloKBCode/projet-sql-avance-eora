@@ -214,19 +214,14 @@ GROUP BY date_trunc('month', c.passee_le), c.canal;
 -- Rôles
 -- ============================================================
 
-DROP ROLE IF EXISTS nora;
-DROP ROLE IF EXISTS samir;
-DROP ROLE IF EXISTS atelier;
-DROP ROLE IF EXISTS compta;
+CREATE ROLE atelier_eora NOLOGIN;
+CREATE ROLE compta_eora  NOLOGIN;
 
-CREATE ROLE atelier NOLOGIN;
-CREATE ROLE compta  NOLOGIN;
+CREATE ROLE nora  LOGIN PASSWORD 'nora'  IN ROLE atelier_eora;
+CREATE ROLE samir LOGIN PASSWORD 'samir' IN ROLE compta_eora;
 
-CREATE ROLE nora  LOGIN PASSWORD 'nora'  IN ROLE atelier;
-CREATE ROLE samir LOGIN PASSWORD 'samir' IN ROLE compta;
-
-GRANT SELECT ON commandes_a_preparer TO atelier;
-GRANT SELECT ON chiffre_affaires     TO compta;
+GRANT SELECT ON commandes_a_preparer TO atelier_eora;
+GRANT SELECT ON chiffre_affaires     TO compta_eora;
 
 -- Index : clés étrangères souvent cherchées, que PostgreSQL n'indexe pas tout seul
 -- Détail d'une commande : WHERE commande_id = 12345 (Seq Scan 3,3 ms -> Index 0,04 ms)

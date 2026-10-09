@@ -56,7 +56,7 @@ Deux clés étrangères souvent cherchées (PostgreSQL ne les indexe pas tout se
 
 ## Rôles
 
-**Ce qu'il fait** : deux rôles-métiers, `atelier` (prépare les commandes) et `compta` (suit les ventes), sans connexion. Deux utilisateurs, `nora` et `samir`, se connectent et en héritent avec `IN ROLE`.
+**Ce qu'il fait** : deux rôles-métiers, `atelier_eora` (prépare les commandes) et `compta_eora` (suit les ventes), sans connexion. Deux utilisateurs, `nora` et `samir`, se connectent et en héritent avec `IN ROLE`.
 
 **Pourquoi il est là** : principe du moindre privilège. Chaque profil n'a que ce dont il a besoin, et les droits sont portés par le métier, pas par la personne : si Nora quitte l'atelier, on supprime `nora` sans toucher aux droits de l'atelier.
 
@@ -68,4 +68,4 @@ Deux clés étrangères souvent cherchées (PostgreSQL ne les indexe pas tout se
 
 **Pourquoi elles sont là** : elles cachent les jointures (quatre tables pour l'atelier) et masquent les données personnelles (email, téléphone, nom complet). Chaque rôle a le droit `SELECT` sur sa vue et aucun droit sur les tables : la vue lit les tables à sa place.
 
-**La preuve** : en tant que `nora`, la vue affiche `Léa B.` mais pas d'email, et la table `clients` renvoie `permission denied` ; en tant que `samir`, `chiffre_affaires` répond mais `commandes_a_preparer` est refusée.
+**La preuve** : en tant que `nora`, `SELECT * FROM commandes_a_preparer WHERE commande = 19365;` affiche 4 lignes au nom de `Zoé C.`, sans email ni téléphone, et la table `clients` renvoie `permission denied` ; en tant que `samir`, `chiffre_affaires` répond mais `commandes_a_preparer` est refusée.
