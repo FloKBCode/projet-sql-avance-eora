@@ -113,3 +113,29 @@ FROM (
   FROM generate_series(1, 60000) AS i
 ) AS s
 JOIN produits p ON p.id = s.produit_id;
+
+-- Procédure : annuler une commande
+-- Refuse une commande inconnue, déjà expédiée ou déjà annulée.
+CREATE PROCEDURE annuler_commande(p_commande_id int)
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    v_statut text;
+BEGIN
+    SELECT statut INTO v_statut FROM commandes WHERE id = p_commande_id;
+
+    IF NOT FOUND THEN
+        RAISE EXCEPTION 'Commande % inconnue : impossible de l''annuler', p_commande_id;
+    END IF;
+
+    IF v_statut = 'expediee' THEN
+        RAISE EXCEPTION 'Commande % déjà expédiée : impossible de l''annuler', p_commande_id;
+    END IF;
+
+    IF v_statut = 'annulee' THEN
+        RAISE EXCEPTION 'Commande % déjà annulée : rien à faire', p_commande_id;
+    END IF;
+
+    UPDATE commandes SET statut = 'annulee' WHERE id = p_commande_id;
+END;
+$$;
