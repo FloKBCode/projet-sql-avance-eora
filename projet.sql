@@ -137,10 +137,19 @@ BEGIN
     END IF;
 
     UPDATE commandes SET statut = 'annulee' WHERE id = p_commande_id;
+
+    -- Les produits de la commande reviennent en stock
+    UPDATE produits p
+    SET stock = p.stock + l.total
+    FROM (SELECT produit_id, sum(quantite) AS total
+          FROM lignes_commande
+          WHERE commande_id = p_commande_id
+          GROUP BY produit_id) AS l
+    WHERE p.id = l.produit_id;
 END;
 $$;
 
--- Trigger : refuser une ligne de commande qui dépasse le stock
+-- Trigger : refuser une ligne de commande qui dépasse le stock, sinon baisser le stock
 -- La fonction fait la vérification, le trigger la lance avant chaque insertion.
 CREATE FUNCTION verifier_stock()
 RETURNS trigger
@@ -150,7 +159,8 @@ DECLARE
     v_nom text;
     v_stock integer;
 BEGIN
-    SELECT nom, stock INTO v_nom, v_stock FROM produits WHERE id = NEW.produit_id;
+    -- FOR UPDATE bloque le produit le temps de la vérification (deux commandes simultanées)
+    SELECT nom, stock INTO v_nom, v_stock FROM produits WHERE id = NEW.produit_id FOR UPDATE;
 
     IF NOT FOUND THEN
         RAISE EXCEPTION 'Produit % inconnu : impossible de l''ajouter à la commande', NEW.produit_id;
@@ -160,6 +170,8 @@ BEGIN
         RAISE EXCEPTION 'Stock insuffisant pour « % » : % demandé(s), % disponible(s)',
             v_nom, NEW.quantite, v_stock;
     END IF;
+
+    UPDATE produits SET stock = stock - NEW.quantite WHERE id = NEW.produit_id;
 
     RETURN NEW;
 END;
