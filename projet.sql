@@ -182,6 +182,47 @@ BEFORE INSERT ON lignes_commande
 FOR EACH ROW
 EXECUTE FUNCTION verifier_stock();
 
+-- ============================================================
+-- Vues
+-- ============================================================
+
+CREATE VIEW commandes_a_preparer AS
+SELECT c.id                                        AS commande,
+       c.passee_le,
+       c.canal,
+       c.statut,
+       p.nom                                       AS produit,
+       l.quantite,
+       cl.prenom || ' ' || left(cl.nom, 1) || '.'  AS client
+FROM commandes c
+JOIN lignes_commande l ON l.commande_id = c.id
+JOIN produits p        ON p.id = l.produit_id
+JOIN clients cl        ON cl.id = c.client_id
+WHERE c.statut IN ('payee', 'en_preparation');
+
+CREATE VIEW chiffre_affaires AS
+SELECT date_trunc('month', c.passee_le)::date   AS mois,
+       c.canal,
+       count(DISTINCT c.id)                     AS commandes,
+       sum(l.quantite * l.prix_unitaire)        AS ca
+FROM commandes c
+JOIN lignes_commande l ON l.commande_id = c.id
+WHERE c.statut IN ('payee', 'en_preparation', 'expediee')
+GROUP BY date_trunc('month', c.passee_le), c.canal;
+
+-- ============================================================
+-- Rôles
+-- ============================================================
+
+CREATE ROLE atelier_eora NOLOGIN;
+CREATE ROLE compta_eora  NOLOGIN;
+
+CREATE ROLE nora  LOGIN PASSWORD 'nora'  IN ROLE atelier_eora;
+CREATE ROLE samir LOGIN PASSWORD 'samir' IN ROLE compta_eora;
+
+GRANT SELECT ON commandes_a_preparer TO atelier_eora;
+GRANT SELECT ON chiffre_affaires     TO compta_eora;
+
 -- Index : clés étrangères souvent cherchées, que PostgreSQL n'indexe pas tout seul
 -- Détail d'une commande : WHERE commande_id = 12345 (Seq Scan 3,3 ms -> Index 0,04 ms)
 CREATE INDEX idx_lignes_commande_commande_id ON lignes_commande (commande_id);
