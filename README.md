@@ -39,6 +39,12 @@ docker compose exec db psql -U festival -d projet
 - **Pourquoi elle est là :** une commande inconnue, déjà expédiée ou déjà annulée est refusée, avec un message qui donne le numéro de commande. Un simple `UPDATE` ne dirait rien (0 ligne modifiée) ou annulerait un colis déjà parti.
 - **La preuve :** `CALL annuler_commande(19364)` passe la commande de `payee` à `annulee` ; `CALL annuler_commande(1)` est refusé : « Commande 1 déjà expédiée : impossible de l'annuler ».
 
+### Procédure `faire_avancer`
+
+- **Ce qu'elle fait :** fait avancer une commande d'une étape, de `payee` à `en_preparation` puis à `expediee`, et refuse tout autre statut.
+- **Pourquoi elle est là :** c'est la seule action de l'atelier. Elle est en `SECURITY DEFINER` : elle s'exécute avec les droits de son propriétaire, ce qui permet à l'atelier de changer un statut sans aucun droit sur la table `commandes`, et seulement dans l'ordre prévu. Le `REVOKE ... FROM PUBLIC` réserve l'appel au rôle `atelier_eora`.
+- **La preuve :** en tant que `nora`, deux `CALL faire_avancer(19367)` passent la commande de `payee` à `en_preparation` puis à `expediee` ; un troisième est refusé : « Commande 19367 au statut « expediee » : l'atelier ne peut pas la faire avancer ». En tant que `samir`, le même appel renvoie `permission denied for procedure faire_avancer`.
+
 ### Trigger `verifier_stock_avant_ajout`
 
 - **Ce qu'il fait :** avant chaque ajout dans `lignes_commande`, compare la quantité demandée au stock du produit, refuse si elle le dépasse, sinon baisse le stock.
@@ -56,19 +62,19 @@ Deux clés étrangères souvent cherchées (PostgreSQL ne les indexe pas tout se
 
 ## Rôles
 
-**Ce qu'il fait** : deux rôles-métiers, `atelier_eora` (prépare les commandes) et `compta_eora` (suit les ventes), sans connexion. Deux utilisateurs, `nora` et `samir`, se connectent et en héritent avec `IN ROLE`.
+**Ce qu'il fait** : trois rôles-métiers sans connexion : `lecteur_eora` (consulte le catalogue), `atelier_eora` (prépare les commandes) et `compta_eora` (suit les ventes). Trois utilisateurs, `lea`, `nora` et `samir`, se connectent et en héritent avec `IN ROLE`. Les sessions de `lea` sont en lecture seule (`default_transaction_read_only`).
 
-**Pourquoi il est là** : principe du moindre privilège. Chaque profil n'a que ce dont il a besoin, et les droits sont portés par le métier, pas par la personne : si Nora quitte l'atelier, on supprime `nora` sans toucher aux droits de l'atelier.
+**Pourquoi il est là** : principe du moindre privilège. Chaque profil n'a que ce dont il a besoin, et les droits sont portés par le métier, pas par la personne : si Nora quitte l'atelier, on supprime `nora` sans toucher aux droits de l'atelier. Les trois profils ont des droits différents : le lecteur ne modifie rien, l'atelier fait avancer les commandes par la procédure `faire_avancer`, la compta contrôle sans rien modifier.
 
-**La preuve** : `SET ROLE nora;` puis `SELECT * FROM commandes_a_preparer;` répond, alors que `SELECT email FROM clients;` affiche `permission denied`. Même chose pour `samir` avec `chiffre_affaires` (autorisé) et `commandes` (refusé). `RESET ROLE;` pour revenir.
+**La preuve** : `SET ROLE nora;` puis `SELECT * FROM commandes_a_preparer;` répond, alors que `SELECT email FROM clients;` affiche `permission denied`. Même chose pour `samir` avec `chiffre_affaires` (autorisé) et `commandes` (refusé). `RESET ROLE;` pour revenir. Connectée en `lea` (`psql -U lea -d projet`), `SELECT * FROM catalogue;` répond, mais `UPDATE produits SET stock = 0;` est refusé (« cannot execute UPDATE in a read-only transaction »), et l'est encore après `SET default_transaction_read_only = off;` (« permission denied for table produits ») : la lecture seule est une protection en plus, les droits restent la vraie barrière.
 
 ## Vues
 
-**Ce qu'elles font** : `commandes_a_preparer` liste, pour l'atelier, les commandes payées ou en préparation avec les produits et les quantités ; le client est réduit à son prénom et à l'initiale de son nom. `chiffre_affaires` donne à la compta le chiffre d'affaires et le nombre de commandes par mois et par canal, sans aucune colonne venant de `clients`.
+**Ce qu'elles font** : `commandes_a_preparer` liste, pour l'atelier, les commandes payées ou en préparation avec les produits et les quantités ; le client est réduit à son prénom et à l'initiale de son nom. `chiffre_affaires` donne à la compta le chiffre d'affaires et le nombre de commandes par mois et par canal, sans aucune colonne venant de `clients`. `catalogue` montre au lecteur les produits actifs avec leur prix et leur stock, sans aucune donnée de commande ni de client.
 
 **Pourquoi elles sont là** : elles cachent les jointures (quatre tables pour l'atelier) et masquent les données personnelles (email, téléphone, nom complet). Chaque rôle a le droit `SELECT` sur sa vue et aucun droit sur les tables : la vue lit les tables à sa place.
 
-**La preuve** : en tant que `nora`, `SELECT * FROM commandes_a_preparer WHERE commande = 19365;` affiche 4 lignes au nom de `Zoé C.`, sans email ni téléphone, et la table `clients` renvoie `permission denied` ; en tant que `samir`, `chiffre_affaires` répond mais `commandes_a_preparer` est refusée.
+**La preuve** : en tant que `nora`, `SELECT * FROM commandes_a_preparer WHERE commande = 19365;` affiche 4 lignes au nom de `Zoé C.`, sans email ni téléphone, et la table `clients` renvoie `permission denied` ; en tant que `samir`, `chiffre_affaires` répond mais `commandes_a_preparer` est refusée ; en tant que `lea`, `catalogue` renvoie les 24 produits et la table `produits` renvoie `permission denied`.
 
 ## Données
 
