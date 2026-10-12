@@ -149,6 +149,32 @@ BEGIN
 END;
 $$;
 
+CREATE PROCEDURE faire_avancer(p_commande_id int)
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+    v_statut text;
+BEGIN
+    SELECT statut INTO v_statut FROM commandes WHERE id = p_commande_id FOR UPDATE;
+
+    IF NOT FOUND THEN
+        RAISE EXCEPTION 'Commande % inconnue', p_commande_id;
+    END IF;
+
+    IF v_statut = 'payee' THEN
+        UPDATE commandes SET statut = 'en_preparation' WHERE id = p_commande_id;
+    ELSIF v_statut = 'en_preparation' THEN
+        UPDATE commandes SET statut = 'expediee' WHERE id = p_commande_id;
+    ELSE
+        RAISE EXCEPTION 'Commande % au statut « % » : l''atelier ne peut pas la faire avancer', p_commande_id, v_statut;
+    END IF;
+END;
+$$;
+
+REVOKE EXECUTE ON PROCEDURE faire_avancer(int) FROM PUBLIC;
+
 -- Trigger : refuser une ligne de commande qui dépasse le stock, sinon baisser le stock
 -- La fonction fait la vérification, le trigger la lance avant chaque insertion.
 CREATE FUNCTION verifier_stock()
@@ -210,6 +236,11 @@ JOIN lignes_commande l ON l.commande_id = c.id
 WHERE c.statut IN ('payee', 'en_preparation', 'expediee')
 GROUP BY date_trunc('month', c.passee_le), c.canal;
 
+CREATE VIEW catalogue AS
+SELECT nom, categorie, prix, stock
+FROM produits
+WHERE actif;
+
 -- ============================================================
 -- Rôles
 -- ============================================================
@@ -222,6 +253,14 @@ CREATE ROLE samir LOGIN PASSWORD 'samir' IN ROLE compta_eora;
 
 GRANT SELECT ON commandes_a_preparer TO atelier_eora;
 GRANT SELECT ON chiffre_affaires     TO compta_eora;
+
+CREATE ROLE lecteur_eora NOLOGIN;
+
+CREATE ROLE lea LOGIN PASSWORD 'lea' IN ROLE lecteur_eora;
+ALTER ROLE lea SET default_transaction_read_only = on;
+
+GRANT SELECT ON catalogue TO lecteur_eora;
+GRANT EXECUTE ON PROCEDURE faire_avancer(int) TO atelier_eora;
 
 -- Index : clés étrangères souvent cherchées, que PostgreSQL n'indexe pas tout seul
 -- Détail d'une commande : WHERE commande_id = 12345 (Seq Scan 3,3 ms -> Index 0,04 ms)
