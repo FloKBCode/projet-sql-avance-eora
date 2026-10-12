@@ -69,3 +69,27 @@ Deux clés étrangères souvent cherchées (PostgreSQL ne les indexe pas tout se
 **Pourquoi elles sont là** : elles cachent les jointures (quatre tables pour l'atelier) et masquent les données personnelles (email, téléphone, nom complet). Chaque rôle a le droit `SELECT` sur sa vue et aucun droit sur les tables : la vue lit les tables à sa place.
 
 **La preuve** : en tant que `nora`, `SELECT * FROM commandes_a_preparer WHERE commande = 19365;` affiche 4 lignes au nom de `Zoé C.`, sans email ni téléphone, et la table `clients` renvoie `permission denied` ; en tant que `samir`, `chiffre_affaires` répond mais `commandes_a_preparer` est refusée.
+
+## Données
+
+**Ce qu'elles font** : 24 produits répartis en quatre catégories, tapés à la main, puis 500 clients, 20 000 commandes et 60 000 lignes de commande fabriqués avec `generate_series`. Les commandes s'étalent du 6 octobre 2025 au 2 octobre 2026 et passent par le site (60 %), les marchés (25 %) ou Instagram (15 %). `setseed(0.42)` rend le tirage identique à chaque exécution.
+
+**Pourquoi elles sont là** : les index ont besoin de volume pour montrer une différence de temps, et les données doivent rester cohérentes pour que les vues et les preuves aient un sens. Chaque commande a au moins une ligne, aucun client ne commande avant son inscription, le prix d'une ligne est celui du catalogue, et seules les commandes des deux dernières semaines sont encore en attente, payées ou en préparation.
+
+**La preuve** : `SELECT count(*) FROM lignes_commande;` renvoie 60 000, et chacun des quatre contrôles de cohérence ci-dessous renvoie 0 :
+
+```sql
+SELECT count(*) FROM commandes c
+WHERE NOT EXISTS (SELECT 1 FROM lignes_commande l WHERE l.commande_id = c.id);
+
+SELECT count(*) FROM commandes c JOIN clients cl ON cl.id = c.client_id
+WHERE c.passee_le::date < cl.inscrit_le;
+
+SELECT count(*) FROM lignes_commande l JOIN produits p ON p.id = l.produit_id
+WHERE l.prix_unitaire <> p.prix;
+
+SELECT count(*) FROM commandes
+WHERE statut IN ('en_attente', 'payee', 'en_preparation') AND passee_le < timestamp '2026-09-21';
+```
+
+Dans l'ordre : aucune commande sans ligne, aucune commande passée avant l'inscription du client, aucun prix différent du catalogue, aucune commande de plus de deux semaines encore en cours.
