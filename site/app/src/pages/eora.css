@@ -1,0 +1,323 @@
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,SOFT,wght@9..144,50..100,400..700&family=Karla:wght@400;500;700&display=swap');
+
+:root {
+  --eora-encre: #2a2430;
+  --eora-encre-douce: #5a5160;
+  --eora-terracotta: #a9502f;
+  --eora-terracotta-pale: #f3ddd2;
+  --eora-or: #b08a3a;
+  --eora-creme: #f7f0e3;
+  --eora-papier: #fffaf2;
+  --eora-trait: #e2d5bf;
+  --eora-sauge: #4f6b4a;
+  --eora-sauge-pale: #dfe9d9;
+  --eora-titre: 'Fraunces', Georgia, serif;
+  --eora-texte: 'Karla', system-ui, sans-serif;
+}
+
+body {
+  margin: 0;
+  background: var(--eora-creme);
+}
+
+.eora {
+  font-family: var(--eora-texte);
+  color: var(--eora-encre);
+  background: var(--eora-creme);
+  line-height: 1.5;
+}
+
+.eora h1,
+.eora h2 {
+  font-family: var(--eora-titre);
+  font-variation-settings: 'SOFT' 100;
+  font-weight: 500;
+  line-height: 1.1;
+  margin: 0;
+}
+
+.eora :focus-visible {
+  outline: 3px solid var(--eora-or);
+  outline-offset: 2px;
+}
+
+.eora-champ {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.eora-champ span {
+  font-weight: 500;
+  font-size: 0.95rem;
+}
+
+.eora-champ input {
+  font: inherit;
+  padding: 0.7rem 0.85rem;
+  border: 1.5px solid var(--eora-trait);
+  border-radius: 10px;
+  background: var(--eora-papier);
+  color: var(--eora-encre);
+}
+
+.eora-champ input:focus {
+  border-color: var(--eora-terracotta);
+}
+
+.eora-bouton {
+  font: inherit;
+  font-weight: 700;
+  padding: 0.8rem 1.4rem;
+  border: none;
+  border-radius: 999px;
+  background: var(--eora-terracotta);
+  color: var(--eora-papier);
+  cursor: pointer;
+}
+
+.eora-bouton:hover {
+  background: #8f4126;
+}
+
+.eora-bouton:disabled {
+  background: var(--eora-encre-douce);
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.eora-message {
+  margin: 0;
+  padding: 0.85rem 1rem;
+  border-radius: 10px;
+  border-left: 4px solid currentColor;
+}
+
+.eora-message--refus {
+  color: #7d3219;
+  background: var(--eora-terracotta-pale);
+}
+
+.eora-message--succes {
+  color: var(--eora-sauge);
+  background: var(--eora-sauge-pale);
+}
+
+.connexion {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+}
+
+.connexion__tige {
+  background: var(--eora-encre);
+  color: var(--eora-creme);
+  padding: clamp(2rem, 5vw, 4rem);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 2rem;
+  overflow: hidden;
+}
+
+.connexion__tige svg {
+  width: min(100%, 320px);
+  height: auto;
+  align-self: center;
+}
+
+.connexion__marque {
+  font-family: var(--eora-titre);
+  font-variation-settings: 'SOFT' 100;
+  font-size: clamp(3rem, 8vw, 5.5rem);
+  line-height: 0.9;
+  color: var(--eora-or);
+}
+
+.connexion__devise {
+  max-width: 28ch;
+  color: #d8cfc2;
+  margin: 0.75rem 0 0;
+}
+
+.connexion__formulaire {
+  display: grid;
+  align-content: center;
+  gap: 1.25rem;
+  width: min(100%, 26rem);
+  margin: 0 auto;
+  padding: clamp(2rem, 5vw, 4rem) 1.5rem;
+}
+
+.connexion__formulaire h1 {
+  font-size: clamp(2rem, 4vw, 2.6rem);
+}
+
+.connexion__intro {
+  margin: 0;
+  color: var(--eora-encre-douce);
+}
+
+.connexion__comptes {
+  margin: 0.5rem 0 0;
+  font-size: 0.9rem;
+  color: var(--eora-encre-douce);
+}
+
+.connexion__comptes code {
+  font-family: inherit;
+  font-weight: 700;
+  color: var(--eora-encre);
+}
+
+.commande {
+  padding: clamp(1.5rem, 4vw, 3rem) clamp(1rem, 4vw, 3rem);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(16rem, 22rem);
+  gap: clamp(1.5rem, 4vw, 3rem);
+  align-items: start;
+}
+
+.commande__catalogue {
+  display: grid;
+  gap: 2.25rem;
+}
+
+.commande__catalogue > header h1 {
+  font-size: clamp(2.2rem, 5vw, 3.4rem);
+}
+
+.commande__catalogue > header p {
+  margin: 0.6rem 0 0;
+  max-width: 60ch;
+  color: var(--eora-encre-douce);
+}
+
+.commande__categorie h2 {
+  font-size: 1.6rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid var(--eora-or);
+  margin-bottom: 0.25rem;
+}
+
+.commande__produit {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.85rem 0;
+  border-bottom: 1px solid var(--eora-trait);
+}
+
+.commande__nom {
+  font-weight: 500;
+}
+
+.commande__stock {
+  display: block;
+  font-size: 0.88rem;
+  color: var(--eora-encre-douce);
+}
+
+.commande__stock--epuise {
+  color: var(--eora-terracotta);
+  font-weight: 700;
+}
+
+.commande__prix {
+  font-variant-numeric: tabular-nums;
+}
+
+.quantite {
+  display: inline-flex;
+  align-items: center;
+  border: 1.5px solid var(--eora-trait);
+  border-radius: 999px;
+  background: var(--eora-papier);
+}
+
+.quantite button {
+  font: inherit;
+  font-size: 1.1rem;
+  width: 2.2rem;
+  height: 2.2rem;
+  border: none;
+  border-radius: 999px;
+  background: none;
+  color: var(--eora-terracotta);
+  cursor: pointer;
+}
+
+.quantite button:disabled {
+  color: var(--eora-trait);
+  cursor: default;
+}
+
+.quantite output {
+  min-width: 2ch;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+}
+
+.panier {
+  position: sticky;
+  top: 1.5rem;
+  display: grid;
+  gap: 1rem;
+  padding: 1.5rem;
+  background: var(--eora-papier);
+  border: 1.5px solid var(--eora-trait);
+  border-radius: 18px;
+}
+
+.panier h2 {
+  font-size: 1.5rem;
+}
+
+.panier ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.4rem;
+}
+
+.panier li {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.panier__vide {
+  margin: 0;
+  color: var(--eora-encre-douce);
+}
+
+.panier__total {
+  display: flex;
+  justify-content: space-between;
+  padding-top: 0.75rem;
+  border-top: 2px solid var(--eora-encre);
+  font-family: var(--eora-titre);
+  font-size: 1.35rem;
+}
+
+@media (max-width: 760px) {
+  .connexion,
+  .commande {
+    grid-template-columns: 1fr;
+  }
+
+  .connexion {
+    min-height: auto;
+  }
+
+  .connexion__tige svg {
+    display: none;
+  }
+
+  .panier {
+    position: static;
+  }
+}
