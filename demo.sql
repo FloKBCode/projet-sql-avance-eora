@@ -1,7 +1,7 @@
 -- ============================================================
 -- Éora · demo.sql : requêtes de la présentation (8 minutes)
 -- Ordre : rôle, vue, index, trigger (puis procédure en bonus)
--- Lancer : docker compose exec db psql -U festival -d projet -f /tmp/demo.sql
+-- Lancer : docker compose exec db psql -U eora -d projet -f /projet/demo.sql
 -- ============================================================
 
 \echo
