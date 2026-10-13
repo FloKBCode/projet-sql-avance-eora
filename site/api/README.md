@@ -7,14 +7,9 @@ Petite API Express entre le site React et la base PostgreSQL du projet. Elle ne 
 
 ## Lancer
 
-Avec la base `projet` déjà créée par `projet.sql`, depuis le dossier `base-festival` du cours :
+La base doit tourner (`docker compose up -d` à la racine du projet, voir le README principal) : `acces.sql` y est chargé automatiquement.
 
-```bash
-docker compose cp ../../projet-sql-avance-eora/site/api/acces.sql db:/tmp/acces.sql
-docker compose exec db psql -U festival -d projet -f /tmp/acces.sql
-```
-
-Puis dans `site/api` (Node 20.6 ou plus récent) :
+Dans `site/api` (Node 20.6 ou plus récent) :
 
 ```bash
 cp .env.example .env
