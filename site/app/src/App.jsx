@@ -3,13 +3,14 @@ import { lireSession, garderSession, effacerSession, deconnexion } from './api'
 import Connexion from './pages/Connexion'
 import Atelier from './pages/Atelier'
 import Catalogue from './pages/Catalogue'
+import ChiffreAffaires from './pages/ChiffreAffaires'
 import './index.css'
 
 // Chaque rôle de la base ouvre sa page.
 const PAGES = {
   lecteur_eora: { titre: 'Catalogue', composant: Catalogue },
   atelier_eora: { titre: 'Atelier', composant: Atelier },
-  compta_eora: { titre: "Chiffre d'affaires", composant: null },
+  compta_eora: { titre: "Chiffre d'affaires", composant: ChiffreAffaires },
 }
 
 function pageDuCompte(roles) {
