@@ -1,0 +1,164 @@
+.boutique {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(16rem, 21rem);
+  gap: 2rem;
+  align-items: start;
+}
+
+.boutique-catalogue {
+  display: grid;
+  gap: 2rem;
+}
+
+.boutique-categorie h2 {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-weight: 600;
+  font-size: 1.4rem;
+  margin: 0 0 0.25rem;
+  padding-bottom: 0.4rem;
+  border-bottom: 2px solid var(--accent);
+}
+
+.boutique-produit {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid var(--trait);
+}
+
+.boutique-nom {
+  font-weight: 600;
+}
+
+.boutique-stock {
+  display: block;
+  font-size: 0.88rem;
+  color: var(--discret);
+}
+
+.boutique-stock-epuise {
+  color: var(--danger);
+  font-weight: 600;
+}
+
+.boutique-prix {
+  font-variant-numeric: tabular-nums;
+}
+
+.boutique-quantite {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid var(--trait);
+  border-radius: 999px;
+  background: var(--surface);
+}
+
+.boutique-quantite button {
+  width: 2.2rem;
+  height: 2.2rem;
+  border: 0;
+  border-radius: 999px;
+  background: none;
+  color: var(--accent);
+  font-size: 1.1rem;
+}
+
+.boutique-quantite button:disabled {
+  color: var(--trait);
+  cursor: default;
+}
+
+.boutique-quantite output {
+  min-width: 2ch;
+  text-align: center;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.boutique-panier {
+  position: sticky;
+  top: 1.5rem;
+  display: grid;
+  gap: 0.5rem;
+  padding: 1.5rem;
+  background: var(--surface);
+  border: 1px solid var(--trait);
+  border-radius: 12px;
+}
+
+.boutique-panier h2 {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-weight: 600;
+  margin: 0 0 0.25rem;
+}
+
+.boutique-panier ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.35rem;
+}
+
+.boutique-panier li {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.boutique-total {
+  display: flex;
+  justify-content: space-between;
+  margin: 0.4rem 0 0.6rem;
+  padding-top: 0.6rem;
+  border-top: 2px solid var(--encre);
+  font-weight: 600;
+  font-size: 1.15rem;
+}
+
+.boutique-message {
+  margin: 0 0 0.4rem;
+  padding: 0.7rem 0.9rem;
+  border-left: 4px solid currentColor;
+  border-radius: 8px;
+}
+
+.boutique-refus {
+  color: var(--danger);
+  background: color-mix(in srgb, var(--danger) 10%, var(--surface));
+}
+
+.boutique-succes {
+  color: #2f6b3f;
+  background: #e4f0e6;
+}
+
+@media (max-width: 760px) {
+  .boutique {
+    grid-template-columns: 1fr;
+  }
+
+  .boutique-panier {
+    position: static;
+  }
+}
+
+.contenu-large {
+  max-width: 72rem;
+}
+
+.aide-boutique {
+  text-align: center;
+}
+
+.lien {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--accent-fonce);
+  font-weight: 600;
+  text-decoration: underline;
+}
