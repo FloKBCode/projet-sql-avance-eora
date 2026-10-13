@@ -12,7 +12,6 @@ export default function Connexion({ onConnecte }) {
     setErreur('')
     setEnvoi(true)
     try {
-      // L'API renvoie { jeton, utilisateur, roles }
       const session = await connexion(utilisateur.trim(), motDePasse)
       onConnecte(session)
     } catch (e) {

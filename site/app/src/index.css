@@ -43,7 +43,6 @@ button {
   outline-offset: 2px;
 }
 
-/* Connexion */
 .connexion {
   max-width: 24rem;
   margin: 8vh auto 0;
@@ -113,7 +112,6 @@ form button:disabled {
   color: var(--discret);
 }
 
-/* Après connexion */
 .entete {
   display: flex;
   align-items: center;
@@ -142,7 +140,6 @@ form button:disabled {
   padding: 1.5rem 1.25rem;
 }
 
-/* Atelier */
 .discret {
   color: var(--discret);
   margin: 0.2rem 0 0.8rem;
@@ -215,4 +212,105 @@ form button:disabled {
 .connexion .sous-titre {
   padding-bottom: 0.9rem;
   border-bottom: 2px solid var(--or);
+}
+
+.categorie h2 {
+  font-family: var(--titre);
+  font-variation-settings: 'SOFT' 100;
+  font-weight: 500;
+  font-size: 1.3rem;
+  margin: 1.8rem 0 0.6rem;
+}
+
+.produits {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 0.8rem;
+  grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr));
+}
+
+.produit {
+  display: grid;
+  gap: 0.2rem;
+  background: var(--surface);
+  border: 1px solid var(--trait);
+  border-radius: 12px;
+  padding: 0.9rem 1rem;
+}
+
+.prix {
+  color: var(--accent-fonce);
+  font-weight: 600;
+}
+
+.stock {
+  font-size: 0.9rem;
+  color: var(--discret);
+}
+
+.rupture {
+  color: var(--danger);
+  font-weight: 600;
+}
+
+.tableau {
+  overflow-x: auto;
+  margin-top: 1.5rem;
+  background: var(--surface);
+  border: 1px solid var(--trait);
+  border-radius: 12px;
+}
+
+.tableau table {
+  width: 100%;
+  border-collapse: collapse;
+  font-variant-numeric: tabular-nums;
+}
+
+.tableau th,
+.tableau td {
+  padding: 0.7rem 1rem;
+  text-align: right;
+  border-bottom: 1px solid var(--trait);
+  white-space: nowrap;
+}
+
+.tableau thead th {
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--discret);
+  border-bottom: 2px solid var(--or);
+}
+
+.tableau th:first-child {
+  text-align: left;
+}
+
+.tableau tbody th {
+  font-weight: 600;
+}
+
+.tableau tbody tr:last-child th,
+.tableau tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.tableau .detail {
+  display: block;
+  font-size: 0.82rem;
+  color: var(--discret);
+}
+
+.tableau .total {
+  font-weight: 700;
+  color: var(--accent-fonce);
+}
+
+.en-cours {
+  font-weight: 400;
+  font-size: 0.82rem;
+  color: var(--accent);
 }

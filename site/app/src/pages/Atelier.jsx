@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 import { appeler } from '../api'
 
-// Le bouton dépend du statut actuel de la commande.
 const ACTION = { payee: 'Mettre en préparation', en_preparation: 'Marquer expédiée' }
 const LIBELLE = { payee: 'Payée', en_preparation: 'En préparation' }
 
@@ -30,7 +29,6 @@ export default function Atelier() {
       await appeler(`/atelier/${id}/avancer`, { method: 'POST' })
       await charger()
     } catch (e) {
-      // message de la base, par exemple « la commande ne peut pas avancer »
       setErreur(e.message)
     } finally {
       setEnCours(null)

@@ -1,7 +1,3 @@
-// Tous les appels à l'API passent par ce fichier.
-// La session (jeton, utilisateur, rôles) reste dans sessionStorage :
-// elle disparaît à la fermeture de l'onglet.
-
 const CLE = 'eora-session'
 
 export function lireSession() {
@@ -27,8 +23,6 @@ export class ErreurApi extends Error {
   }
 }
 
-// Le jeton part dans l'en-tête Authorization, comme l'attend l'API.
-// Quand la base refuse (401, 403, 409...), le message de l'API est repris tel quel.
 export async function appeler(chemin, { method = 'GET', corps } = {}) {
   const session = lireSession()
   const entetes = {}
