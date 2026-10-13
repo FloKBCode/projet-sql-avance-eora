@@ -192,3 +192,43 @@ form button:disabled {
 .secondaire {
   margin-top: 1rem;
 }
+
+/* Catalogue */
+.categorie h2 {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 1.3rem;
+  margin: 1.8rem 0 0.6rem;
+}
+
+.produits {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 0.8rem;
+  grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr));
+}
+
+.produit {
+  display: grid;
+  gap: 0.2rem;
+  background: var(--surface);
+  border: 1px solid var(--trait);
+  border-radius: 12px;
+  padding: 0.9rem 1rem;
+}
+
+.prix {
+  color: var(--accent-fonce);
+  font-weight: 600;
+}
+
+.stock {
+  font-size: 0.9rem;
+  color: var(--discret);
+}
+
+.rupture {
+  color: var(--danger);
+  font-weight: 600;
+}

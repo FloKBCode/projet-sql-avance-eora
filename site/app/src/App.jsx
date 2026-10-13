@@ -1,15 +1,15 @@
-import Atelier from './pages/Atelier'
 import { useState } from 'react'
 import { lireSession, garderSession, effacerSession, deconnexion } from './api'
 import Connexion from './pages/Connexion'
+import Atelier from './pages/Atelier'
+import Catalogue from './pages/Catalogue'
 import './index.css'
 
-// Chaque rôle de la base ouvre sa page. Les pages Catalogue, Atelier et
-// Chiffre d'affaires restent à écrire : on remplace le texte par le composant.
+// Chaque rôle de la base ouvre sa page.
 const PAGES = {
-  lecteur_eora: { titre: 'Catalogue' },
-  atelier_eora: { titre: 'Atelier' },
-  compta_eora: { titre: "Chiffre d'affaires" },
+  lecteur_eora: { titre: 'Catalogue', composant: Catalogue },
+  atelier_eora: { titre: 'Atelier', composant: Atelier },
+  compta_eora: { titre: "Chiffre d'affaires", composant: null },
 }
 
 function pageDuCompte(roles) {
@@ -38,6 +38,7 @@ export default function App() {
   if (!session) return <Connexion onConnecte={onConnecte} />
 
   const page = pageDuCompte(session.roles ?? [])
+  const Composant = page?.composant
 
   return (
     <>
@@ -50,7 +51,7 @@ export default function App() {
       </header>
       <main className="contenu">
         <h1>{page?.titre ?? 'Compte sans page'}</h1>
-        {page?.titre === 'Atelier' ? <Atelier /> : <p>Page à construire.</p>}
+        {Composant ? <Composant /> : <p>Page à construire.</p>}
       </main>
     </>
   )
