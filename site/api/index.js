@@ -4,7 +4,7 @@ import pg from 'pg';
 
 const ROLES_METIER = ['lecteur_eora', 'atelier_eora', 'compta_eora'];
 const DUREE_SESSION = 2 * 60 * 60 * 1000;
-const BASE = new URL(process.env.BASE_URL ?? 'postgres://localhost:5432/projet');
+const BASE = new URL(process.env.BASE_URL ?? 'postgres://localhost:5433/projet');
 
 const boutique = new pg.Pool({ connectionString: process.env.BOUTIQUE_URL });
 boutique.on('error', (erreur) => console.error(erreur));
