@@ -15,20 +15,28 @@ Projet de groupe du cours SQL avancé (Ynov, Bachelor 2, 2026-2027).
 Une commande appartient à un client, une ligne appartient à une commande et désigne un produit.
 Le statut d'une commande suit le parcours `en_attente`, `payee`, `en_preparation`, `expediee`, ou s'arrête sur `annulee`.
 
-## Lancer le script
+## Lancer la base
 
-Depuis le dossier `base-festival` du cours, avec le conteneur démarré :
+Depuis le dossier du projet, avec Docker démarré :
 
 ```bash
-docker compose exec db psql -U festival -c "DROP DATABASE IF EXISTS projet WITH (FORCE)" -c "CREATE DATABASE projet"
-docker compose cp ../../projet-sql-avance-eora/projet.sql db:/tmp/projet.sql
-docker compose exec db psql -U festival -d projet -f /tmp/projet.sql
+docker compose up -d
 ```
 
-Pour se connecter ensuite à la base :
+Le conteneur `eora-db` (PostgreSQL 16, sur le port 5433 de la machine) crée la base `projet` et y charge `projet.sql` puis `site/api/acces.sql` au premier démarrage. Le chargement prend une vingtaine de secondes : `docker compose logs -f db` affiche `database system is ready to accept connections` quand il est terminé.
+
+Pour se connecter ensuite à la base, puis rejouer la démonstration :
 
 ```bash
-docker compose exec db psql -U festival -d projet
+docker compose exec db psql -U eora -d projet
+docker compose exec db psql -U eora -d projet -f /projet/demo.sql
+```
+
+Pour repartir d'une base neuve, après une modification de `projet.sql` par exemple :
+
+```bash
+docker compose down -v
+docker compose up -d
 ```
 
 ## Procédure, trigger et index
