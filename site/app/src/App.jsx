@@ -1,16 +1,16 @@
-import Atelier from './pages/Atelier'
 import { useState } from 'react'
 import { lireSession, garderSession, effacerSession, deconnexion } from './api'
 import Connexion from './pages/Connexion'
+import Atelier from './pages/Atelier'
+import Catalogue from './pages/Catalogue'
+import ChiffreAffaires from './pages/ChiffreAffaires'
 import Commande from './pages/Commande'
 import './index.css'
 
-// Chaque rôle de la base ouvre sa page. Les pages Catalogue, Atelier et
-// Chiffre d'affaires restent à écrire : on remplace le texte par le composant.
 const PAGES = {
-  lecteur_eora: { titre: 'Catalogue' },
-  atelier_eora: { titre: 'Atelier' },
-  compta_eora: { titre: "Chiffre d'affaires" },
+  lecteur_eora: { titre: 'Catalogue', composant: Catalogue },
+  atelier_eora: { titre: 'Atelier', composant: Atelier },
+  compta_eora: { titre: "Chiffre d'affaires", composant: ChiffreAffaires },
 }
 
 function pageDuCompte(roles) {
@@ -28,11 +28,7 @@ export default function App() {
   }
 
   async function sortir() {
-    try {
-      await deconnexion()
-    } catch {
-      // la session est de toute façon fermée côté site
-    }
+    await deconnexion().catch(() => null)
     effacerSession()
     setSession(null)
   }
@@ -67,6 +63,7 @@ export default function App() {
   }
 
   const page = pageDuCompte(session.roles ?? [])
+  const Composant = page?.composant
 
   return (
     <>
@@ -80,7 +77,7 @@ export default function App() {
       </header>
       <main className="contenu">
         <h1>{page?.titre ?? 'Compte sans page'}</h1>
-        {page?.titre === 'Atelier' ? <Atelier /> : <p>Page à construire.</p>}
+        {Composant ? <Composant /> : <p>Page à construire.</p>}
       </main>
     </>
   )
