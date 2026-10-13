@@ -11,12 +11,13 @@
 }
 
 .boutique-categorie h2 {
-  font-family: Georgia, 'Times New Roman', serif;
-  font-weight: 600;
+  font-family: var(--titre);
+  font-variation-settings: 'SOFT' 100;
+  font-weight: 500;
   font-size: 1.4rem;
   margin: 0 0 0.25rem;
   padding-bottom: 0.4rem;
-  border-bottom: 2px solid var(--accent);
+  border-bottom: 2px solid var(--or);
 }
 
 .boutique-produit {
@@ -89,8 +90,9 @@
 }
 
 .boutique-panier h2 {
-  font-family: Georgia, 'Times New Roman', serif;
-  font-weight: 600;
+  font-family: var(--titre);
+  font-variation-settings: 'SOFT' 100;
+  font-weight: 500;
   margin: 0 0 0.25rem;
 }
 

@@ -1,12 +1,17 @@
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,SOFT,wght@9..144,50..100,400..700&family=Karla:wght@400;500;700&display=swap');
+
 :root {
-  --fond: #f4f1f8;
-  --surface: #ffffff;
-  --encre: #2a2433;
-  --discret: #6c6478;
-  --accent: #7a4eab;
-  --accent-fonce: #5f3a8a;
-  --trait: #ded6ea;
-  --danger: #a32d4a;
+  --fond: #f7f0e3;
+  --surface: #fffaf2;
+  --encre: #2a2430;
+  --discret: #5a5160;
+  --accent: #a9502f;
+  --accent-fonce: #8f4126;
+  --or: #b08a3a;
+  --trait: #e2d5bf;
+  --danger: #8e2a2a;
+  --titre: 'Fraunces', Georgia, serif;
+  --texte: 'Karla', system-ui, sans-serif;
 }
 
 * {
@@ -17,13 +22,14 @@ body {
   margin: 0;
   background: var(--fond);
   color: var(--encre);
-  font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+  font-family: var(--texte);
   line-height: 1.5;
 }
 
 h1 {
-  font-family: Georgia, 'Times New Roman', serif;
-  font-weight: 600;
+  font-family: var(--titre);
+  font-variation-settings: 'SOFT' 100;
+  font-weight: 500;
   margin: 0 0 0.25rem;
 }
 
@@ -33,7 +39,7 @@ button {
 }
 
 :focus-visible {
-  outline: 3px solid var(--accent);
+  outline: 3px solid var(--or);
   outline-offset: 2px;
 }
 
@@ -191,4 +197,22 @@ form button:disabled {
 
 .secondaire {
   margin-top: 1rem;
+}
+
+.entete strong {
+  font-family: var(--titre);
+  font-variation-settings: 'SOFT' 100;
+  font-weight: 500;
+  font-size: 1.35rem;
+  color: var(--accent-fonce);
+}
+
+.connexion h1 {
+  font-size: 3.6rem;
+  line-height: 1;
+}
+
+.connexion .sous-titre {
+  padding-bottom: 0.9rem;
+  border-bottom: 2px solid var(--or);
 }
